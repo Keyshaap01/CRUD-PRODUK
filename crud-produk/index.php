@@ -1,8 +1,18 @@
 <?php
-require "db.php";
-$stmt = $pdo->query("SELECT id, nama_produk, harga, stok, deskripsi FROM produk ORDER BY id DESC");
-$produk = $stmt->fetchAll();
+$dbError = null;
+$produk = [];
+try {
+    require "db.php";
+    $stmt = $pdo->query("SELECT id, nama_produk, harga, stok, deskripsi FROM produk ORDER BY id DESC");
+    $produk = $stmt->fetchAll();
+} catch (Throwable $ex) {
+    $dbError = $ex->getMessage();
+}
 
+function e($value) {
+    return htmlspecialchars((string)$value, ENT_QUOTES, "UTF-8");
+}
+?>
 function e($value) {
     return htmlspecialchars((string)$value, ENT_QUOTES, "UTF-8");
 }
@@ -27,6 +37,9 @@ function e($value) {
     </header>
 
     <?php if (isset($_GET["status"])): ?>
+    <?php if ($dbError): ?>
+    <div class="alert">Database belum terhubung: <?= e($dbError) ?></div>
+<?php endif; ?>
         <div class="alert">
             <?php
             $messages = [
